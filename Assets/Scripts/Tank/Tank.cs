@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class Tank<T> : MonoBehaviour where T : Tank<T>
 {
-    T instance;
-    public T Instance { get { return instance; } }
+    static T instance;
+    public static T Instance { get { return instance; } }
 
     protected virtual void Awake()
     {
