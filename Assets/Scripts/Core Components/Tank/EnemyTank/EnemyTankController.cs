@@ -1,15 +1,19 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyTankController : TankController
 {
 
-    EnemyTankModel EnemyTankModel;
-    EnemyTankView EnemyTankView;
+    public EnemyTankModel EnemyTankModel { protected set; get; }
+    public EnemyTankView EnemyTankView { protected set; get; }
 
-    float nextDirectionUpdateInterval;
+    EnemyTankState EnemyTankState { set; get; }
 
-    bool triggerShoot;
+    Dictionary<EnemyTankStates, EnemyTankState> EnemyTankStatesObjects;
+
+    public float Horizontal { get { return horizontal; } }
+    public float Vertical { get { return vertical; } }
 
     public EnemyTankController(EnemyTankScriptableObject enemyTankScriptableObject) : base((TankScriptableObject)enemyTankScriptableObject)
     {
@@ -23,9 +27,16 @@ public class EnemyTankController : TankController
         EnemyTankView.EnemyTankController = this;
         TankView.TankController = (TankController)this;
 
-        nextDirectionUpdateInterval = UnityEngine.Random.Range(EnemyTankModel.SpawnChance / 2, EnemyTankModel.SpawnChance + 1);
+        // Initialize the dictionary and populate it with state objects
+        EnemyTankStatesObjects = new Dictionary<EnemyTankStates, EnemyTankState>
+        {
+            { EnemyTankStates.Idle, new EnemyTankStateIdle(this) },
+            { EnemyTankStates.Attack, new EnemyTankStateAttack(this) },
+            { EnemyTankStates.Chase, new EnemyTankStateChase(this) },
+            { EnemyTankStates.Patrol, new EnemyTankStatePatrol(this) },
+        };
 
-        triggerShoot = false;
+        SetState(EnemyTankStates.Idle);
     }
 
     public override void Update()
@@ -33,33 +44,11 @@ public class EnemyTankController : TankController
         if (!EnemyTankModel.IsAlive)
         {
             GameObject.Destroy(EnemyTankView.gameObject);
+            return;
         }
 
-        nextDirectionUpdateInterval -= Time.fixedDeltaTime;
-
-        if (nextDirectionUpdateInterval <= 0)
-        {
-            ResetDirection();
-        }
-
-        CanSeePlayer();
-
-        base.Update();
-    }
-
-    public void FixedUpdate()
-    {
-        EnemyTankModel.TimeLeftForNextShot -= Time.fixedDeltaTime;
-
-        if (triggerShoot)
-        {
-            if (EnemyTankModel.TimeLeftForNextShot <= 0)
-            {
-                EnemyTankModel.TimeLeftForNextShot = EnemyTankModel.FireRate;
-                Shoot();
-            }
-            triggerShoot = false;
-        }
+        if (EnemyTankState != null)
+            EnemyTankState.Tick();
     }
 
     public void OnCollisionEnter(Collision collision)
@@ -67,18 +56,56 @@ public class EnemyTankController : TankController
         ResetDirection();
     }
 
-    void ResetDirection()
+    public void SetState(EnemyTankStates state)
+    {
+        if (state == EnemyTankModel.CurrentState)
+            return;
+        if (EnemyTankState != null)
+            switch (EnemyTankModel.CurrentState)
+            {
+                case EnemyTankStates.Idle:
+                    ((EnemyTankStateIdle)EnemyTankState).OnStateExit();
+                    break;
+                case EnemyTankStates.Patrol:
+                    ((EnemyTankStatePatrol)EnemyTankState).OnStateExit();
+                    break;
+                case EnemyTankStates.Chase:
+                    ((EnemyTankStateChase)EnemyTankState).OnStateExit();
+                    break;
+                case EnemyTankStates.Attack:
+                    ((EnemyTankStateAttack)EnemyTankState).OnStateExit();
+                    break;
+            }
+
+        EnemyTankState = EnemyTankStatesObjects[state];
+
+        switch (state)
+        {
+            case EnemyTankStates.Idle:
+                ((EnemyTankStateIdle)EnemyTankState).OnStateEnter();
+                break;
+            case EnemyTankStates.Patrol:
+                ((EnemyTankStatePatrol)EnemyTankState).OnStateEnter();
+                break;
+            case EnemyTankStates.Chase:
+                ((EnemyTankStateChase)EnemyTankState).OnStateEnter();
+                break;
+            case EnemyTankStates.Attack:
+                ((EnemyTankStateAttack)EnemyTankState).OnStateEnter();
+                break;
+        }
+    }
+
+    public void ResetDirection()
     {
         // using random function to generate a random direction
         // Tank moves in random direction and this changes every x random seconds
         // or if tank collides with any objects
         horizontal = UnityEngine.Random.Range(-1f, 1f);
         vertical = UnityEngine.Random.Range(-1f, 1f);
-
-        nextDirectionUpdateInterval = UnityEngine.Random.Range(EnemyTankModel.SpawnChance / 2, EnemyTankModel.SpawnChance + 1);
     }
 
-    void CanSeePlayer()
+    public void CanSeePlayer()
     {
         Vector3 start = EnemyTankView.BulletSpawnPosition.position;
         Vector3 direction = EnemyTankView.BulletSpawnPosition.forward.normalized; // Normalize the direction vector
@@ -101,7 +128,7 @@ public class EnemyTankController : TankController
             // parent component check too
             if (hitObject.GetComponent<PlayerTankView>() != null || hitObject.GetComponentInParent<PlayerTankView>() != null)
             {
-                triggerShoot = true;
+                SetState(EnemyTankStates.Attack);
             }
         }
     }

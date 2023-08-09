@@ -19,7 +19,7 @@ public class TankController
             HandleMovement(horizontal, vertical, Time.deltaTime);
     }
 
-    protected void HandleMovement(float horizontal, float vertical, float timeVariance)
+    protected virtual void HandleMovement(float horizontal, float vertical, float timeVariance)
     {
         Vector3 position = TankView.Position;
         position.x += horizontal * TankModel.Speed * timeVariance;
@@ -32,7 +32,7 @@ public class TankController
         TankView.ApplyTranform = true;
     }
 
-    protected void Shoot()
+    public void Shoot()
     {
         AmmoScriptableObject ammoScriptableObject = TankModel.AmmoScriptableObject;
 
