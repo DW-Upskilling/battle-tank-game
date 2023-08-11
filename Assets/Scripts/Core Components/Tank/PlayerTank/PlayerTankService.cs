@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerTankService : TankService<PlayerTankService>
+public class PlayerTankService : Singleton<PlayerTankService>
 {
 
     [SerializeField]

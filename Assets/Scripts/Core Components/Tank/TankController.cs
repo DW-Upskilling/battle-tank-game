@@ -25,9 +25,14 @@ public class TankController
         position.x += horizontal * TankModel.Speed * timeVariance;
         position.z += vertical * TankModel.Speed * timeVariance;
 
-        Vector3 rotation = new Vector3(horizontal, position.y, vertical);
+        Vector3 rotation = Vector3.zero;
+        rotation.x = horizontal;
+        rotation.y = position.y;
+        rotation.z = vertical;
 
-        TankView.Rotation = Quaternion.LookRotation(rotation);
+        if (rotation != Vector3.zero)
+            TankView.Rotation = Quaternion.LookRotation(rotation);
+
         TankView.Position = position;
         TankView.ApplyTranform = true;
     }
@@ -48,8 +53,8 @@ public class TankController
     {
         TankModel.CurrentHealth -= damage;
 
-        Debug.Log("Damage: " + damage);
-        Debug.Log("Tank Health: " + TankModel.CurrentHealth);
+        // Debug.Log("Damage: " + damage);
+        // Debug.Log("Tank Health: " + TankModel.CurrentHealth);
 
         if (TankModel.CurrentHealth <= 0)
         {

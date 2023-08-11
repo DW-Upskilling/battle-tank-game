@@ -43,6 +43,7 @@ public class EnemyTankController : TankController
     {
         if (!EnemyTankModel.IsAlive)
         {
+            KillEvent.Instance.TriggerEvent(EnemyTankView.gameObject);
             GameObject.Destroy(EnemyTankView.gameObject);
             return;
         }

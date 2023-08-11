@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemyTankService : TankService<EnemyTankService>
+public class EnemyTankService : Singleton<EnemyTankService>
 {
     [SerializeField]
     EnemyTankScriptableObjectList enemyTankScriptableObjectList;

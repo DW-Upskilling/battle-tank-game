@@ -28,7 +28,8 @@ class EnemyTankStateChase : EnemyTankState
 
             Vector3 position = Vector3.MoveTowards(EnemyTankView.gameObject.transform.position, playerTransform.position, EnemyTankModel.Speed * Time.deltaTime);
 
-            EnemyTankView.Rotation = Quaternion.LookRotation(position);
+            if (position != Vector3.zero)
+                EnemyTankView.Rotation = Quaternion.LookRotation(position);
             EnemyTankView.Position = position;
             EnemyTankView.ApplyTranform = true;
         }

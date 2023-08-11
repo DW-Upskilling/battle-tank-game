@@ -49,6 +49,7 @@ public class PlayerTankController : TankController
 
         if (!PlayerTankModel.IsAlive)
         {
+            DeathEvent.Instance.TriggerEvent(PlayerTankView.gameObject);
             DestroyFlag = true;
             PlayerTankView.Destroy();
             return;
@@ -69,6 +70,7 @@ public class PlayerTankController : TankController
             if (PlayerTankModel.TimeLeftForNextShot <= 0)
             {
                 PlayerTankModel.TimeLeftForNextShot = PlayerTankModel.FireRate;
+                AmmoUsageEvent.Instance.TriggerEvent(PlayerTankView.gameObject);
                 Shoot();
             }
             triggerShoot = false;
