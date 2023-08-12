@@ -44,7 +44,13 @@ public class TankController
         switch (ammoScriptableObject.AmmoType)
         {
             case AmmoType.Bullet:
-                new BulletController((BulletScriptableObject)ammoScriptableObject, this, TankView.BulletSpawnPosition);
+                BulletPool bulletPool = BulletPool.Instance;
+                if (bulletPool != null)
+                {
+                    BulletController bulletController = bulletPool.GetItem();
+                    bulletController.Reset(this, TankView.BulletSpawnPosition);
+                }
+                // new BulletController((BulletScriptableObject)ammoScriptableObject, this, TankView.BulletSpawnPosition);
                 break;
         }
     }

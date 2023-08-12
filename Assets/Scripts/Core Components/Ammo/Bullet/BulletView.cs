@@ -45,10 +45,10 @@ public class BulletView : MonoBehaviour
 
     protected virtual void FixedUpdate() { }
 
-    public void Destroy()
-    {
-        Destroy(gameObject);
-    }
+    // public void Destroy()
+    // {
+    //     Destroy(gameObject);
+    // }
 
     void OnCollisionEnter(Collision collision)
     {
@@ -68,4 +68,12 @@ public class BulletView : MonoBehaviour
         }
 
     }
+
+    protected void OnEnable()
+    {
+        if (BulletController != null)
+            BulletController.HandleFireMovement();
+    }
+
+    protected void OnDisable() { }
 }
