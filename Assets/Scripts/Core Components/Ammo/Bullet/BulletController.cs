@@ -14,6 +14,9 @@ public class BulletController
     public BulletController(BulletScriptableObject bulletScriptableObject)
     {
 
+        ParentTankContoller = null;
+        SpawnPoint = null;
+
         BulletModel = new BulletModel(bulletScriptableObject);
         BulletView = GameObject.Instantiate<BulletView>(bulletScriptableObject.BulletViewPrefab, Vector3.zero, Quaternion.identity);
 
@@ -110,6 +113,7 @@ public class BulletController
 
         BulletView.Position = spawnPoint.position;
         BulletView.Rotation = spawnPoint.rotation;
+        BulletView.ApplyTranform = true;
 
         BulletView.gameObject.SetActive(true);
     }
