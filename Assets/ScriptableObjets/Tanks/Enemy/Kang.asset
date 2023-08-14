@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tankName: Kang
   tankType: 2
-  speed: 8
+  speed: 2
   health: 500
   fireRate: 3
   damage: 25

@@ -2,10 +2,7 @@ using UnityEngine;
 
 public class AchievementSystem : Singleton<AchievementSystem>
 {
-    protected override void Initialize()
-    {
-
-    }
+    protected override void Initialize(){}
 
     void Start()
     {

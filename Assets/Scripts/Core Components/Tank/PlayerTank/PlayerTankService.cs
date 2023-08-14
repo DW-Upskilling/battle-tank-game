@@ -7,10 +7,6 @@ public class PlayerTankService : Singleton<PlayerTankService>
     [SerializeField]
     PlayerTankScriptableObject PlayerTankScriptableObject;
 
-    // Following GameObjects will be destroyed from the scene
-    [SerializeField]
-    GameObject Ground, LevelArt;
-
     [SerializeField]
     Joystick Joystick;
 
@@ -19,12 +15,14 @@ public class PlayerTankService : Singleton<PlayerTankService>
 
     protected override void Initialize()
     {
+        
+    }
+
+   void Start()
+    {
         if (PlayerTankScriptableObject != null)
         {
             PlayerTankController playerTankController = new PlayerTankController(PlayerTankScriptableObject, Joystick, ShootButton);
-
-            playerTankController.GroundGameObject = Ground;
-            playerTankController.LevelArtGameObject = LevelArt;
         }
     }
 }

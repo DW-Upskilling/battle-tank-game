@@ -19,19 +19,4 @@ public class PlayerTankView : TankView
         if (PlayerTankController != null)
             PlayerTankController.FixedUpdate();
     }
-
-    public void Destroy()
-    {
-        // Remove the TankParts from the Scene
-        foreach (Transform childTransform in gameObject.transform)
-        {
-            // Check if the child transform has the specified tag
-            if (childTransform.CompareTag("Player"))
-            {
-                GameObject.Destroy(childTransform.gameObject);
-            }
-        }
-
-        StartCoroutine(PlayerTankController.DestroyEnemies());
-    }
 }

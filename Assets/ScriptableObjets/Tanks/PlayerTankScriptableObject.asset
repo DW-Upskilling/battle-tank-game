@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tankName: Kratos
   tankType: 4
-  speed: 3
+  speed: 5
   health: 1
   fireRate: 2
   damage: 10
