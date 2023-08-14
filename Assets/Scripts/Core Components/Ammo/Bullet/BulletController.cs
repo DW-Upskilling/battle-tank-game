@@ -2,14 +2,38 @@ using UnityEngine;
 
 public class BulletController
 {
-    TankController ParentTankContoller;
+    public TankController ParentTankContoller { get; set; }
 
-    Transform SpawnPoint;
+    public Transform SpawnPoint { get; set; }
 
     public BulletModel BulletModel { get; }
     public BulletView BulletView { get; }
 
     float timeLeft, collisions;
+
+    public BulletController(BulletScriptableObject bulletScriptableObject)
+    {
+
+        ParentTankContoller = null;
+        SpawnPoint = null;
+
+        BulletModel = new BulletModel(bulletScriptableObject);
+        BulletView = GameObject.Instantiate<BulletView>(bulletScriptableObject.BulletViewPrefab, Vector3.zero, Quaternion.identity);
+
+        PhysicMaterial physicMaterial = new PhysicMaterial();
+        physicMaterial.bounciness = BulletModel.Bounciness;
+        physicMaterial.frictionCombine = PhysicMaterialCombine.Minimum;
+        physicMaterial.bounceCombine = PhysicMaterialCombine.Maximum;
+
+        BulletView.BulletController = this;
+
+        BulletView.MeshColliderComponent.material = physicMaterial;
+
+        BulletView.RigidbodyComponent.useGravity = BulletModel.UseGravity;
+
+        timeLeft = 0;
+        collisions = 0;
+    }
 
     public BulletController(BulletScriptableObject bulletScriptableObject, TankController parentTankContoller, Transform spawnPoint)
     {
@@ -33,7 +57,7 @@ public class BulletController
         timeLeft = BulletModel.LifeTime;
         collisions = BulletModel.MaxCollisions;
 
-        handleFireMovement();
+        HandleFireMovement();
     }
 
     public void Update()
@@ -41,7 +65,11 @@ public class BulletController
         timeLeft -= Time.deltaTime;
 
         if (collisions <= 0 || timeLeft <= 0)
-            BulletView.Destroy();
+        {
+            BulletView.gameObject.SetActive(false);
+            if (BulletPool.Instance != null)
+                BulletPool.Instance.ReturnItem(this);
+        }
     }
 
     public void OnCollisionEnter(EnemyTankController enemyTankController)
@@ -61,7 +89,7 @@ public class BulletController
         }
     }
 
-    void handleFireMovement()
+    public void HandleFireMovement()
     {
         Vector3 direction = SpawnPoint.forward * BulletModel.Speed;
 
@@ -73,5 +101,20 @@ public class BulletController
     public float GetDamage()
     {
         return BulletModel.Damage * ParentTankContoller.TankModel.Damage;
+    }
+
+    public void Reset(TankController parentTankContoller, Transform spawnPoint)
+    {
+        timeLeft = BulletModel.LifeTime;
+        collisions = BulletModel.MaxCollisions;
+
+        ParentTankContoller = parentTankContoller;
+        SpawnPoint = spawnPoint;
+
+        BulletView.Position = spawnPoint.position;
+        BulletView.Rotation = spawnPoint.rotation;
+        BulletView.ApplyTranform = true;
+
+        BulletView.gameObject.SetActive(true);
     }
 }
