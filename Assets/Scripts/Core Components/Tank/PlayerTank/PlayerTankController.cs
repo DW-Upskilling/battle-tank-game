@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,13 +8,13 @@ public class PlayerTankController : TankController
     PlayerTankModel PlayerTankModel;
     PlayerTankView PlayerTankView;
 
+    LevelManager LevelManager;
+
     Joystick joystick;
     Button shootButton;
 
     bool triggerShoot;
     bool DestroyFlag;
-
-    public GameObject GroundGameObject, LevelArtGameObject;
 
     public PlayerTankController(PlayerTankScriptableObject playerTankScriptableObject, Joystick _joystick, Button _shootButton) : base((TankScriptableObject)playerTankScriptableObject)
     {
@@ -36,6 +35,10 @@ public class PlayerTankController : TankController
         PlayerTankView.PlayerTankController = this;
         TankView.TankController = (TankController)this;
 
+        LevelManager = LevelManager.Instance;
+        if(LevelManager == null)
+            throw new NullReferenceException("LevelManager isn't available");
+
         triggerShoot = false;
         DestroyFlag = false;
 
@@ -51,7 +54,7 @@ public class PlayerTankController : TankController
         {
             DeathEvent.Instance.TriggerEvent(PlayerTankView.gameObject);
             DestroyFlag = true;
-            PlayerTankView.Destroy();
+            LevelManager.PlayerLost(PlayerTankView);
             return;
         }
 
@@ -82,70 +85,4 @@ public class PlayerTankController : TankController
         triggerShoot = true;
     }
 
-    public IEnumerator DestroyGround()
-    {
-        // Wait 1 second before destorying
-        yield return new WaitForSeconds(1f);
-
-        if (GroundGameObject == null)
-            yield return null;
-
-        foreach (Transform childTransform in GroundGameObject.transform)
-        {
-            GameObject.Destroy(childTransform.gameObject);
-
-            // Wait 0.5 seconds after destorying
-            yield return new WaitForSeconds(.5f);
-        }
-
-        yield return DestroyLevelArt();
-    }
-
-    public IEnumerator DestroyLevelArt()
-    {
-        // Wait 1 second before destorying
-        yield return new WaitForSeconds(1f);
-
-        if (LevelArtGameObject == null)
-            yield return null;
-
-        foreach (Transform childTransform in LevelArtGameObject.transform)
-        {
-            GameObject.Destroy(childTransform.gameObject);
-
-            // Wait 0.5 seconds after destorying
-            yield return new WaitForSeconds(.5f);
-        }
-
-        yield return DestroyPlayer();
-    }
-
-    public IEnumerator DestroyEnemies()
-    {
-        // Wait 1 second before destorying
-        yield return new WaitForSeconds(1f);
-
-        // Get Enemy Tanks in the scene
-        // Currently enemies werent created under a parent gameObject 
-        // So using object based search instead of string based tag search
-        EnemyTankView[] EnemyTanks = GameObject.FindObjectsOfType<EnemyTankView>();
-        foreach (EnemyTankView EnemyTank in EnemyTanks)
-        {
-            GameObject.Destroy(EnemyTank.gameObject);
-
-            // Wait 0.5 seconds after destorying
-            yield return new WaitForSeconds(.5f);
-        }
-
-        yield return DestroyGround();
-    }
-
-    public IEnumerator DestroyPlayer()
-    {
-        // Wait 1 second before destorying
-        yield return new WaitForSeconds(1f);
-
-        // Finally Destory the Player
-        GameObject.Destroy(PlayerTankView.gameObject);
-    }
 }

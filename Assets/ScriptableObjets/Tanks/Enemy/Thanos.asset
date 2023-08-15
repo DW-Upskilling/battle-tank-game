@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tankName: Thanos
   tankType: 1
-  speed: 5
+  speed: 3
   health: 1000
   fireRate: 2
   damage: 10
