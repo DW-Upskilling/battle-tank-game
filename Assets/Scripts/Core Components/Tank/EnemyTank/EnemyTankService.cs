@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyTankService : Singleton<EnemyTankService>
@@ -9,8 +10,12 @@ public class EnemyTankService : Singleton<EnemyTankService>
     short spawnCount;
     public short SpawnCount { get { return spawnCount; } }
 
+    public List<EnemyTankController> EnemyTankControllerList;
+
     protected override void Initialize()
     {
+
+        EnemyTankControllerList = new List<EnemyTankController>();
 
         for (int i = 0; i < spawnCount; i++)
         {
@@ -18,7 +23,9 @@ public class EnemyTankService : Singleton<EnemyTankService>
             if (enemyTankScriptableObject == null)
                 continue;
 
-            new EnemyTankController(enemyTankScriptableObject);
+            EnemyTankController enemyTankController = new EnemyTankController(enemyTankScriptableObject);
+
+            EnemyTankControllerList.Add(enemyTankController);
         }
 
     }
