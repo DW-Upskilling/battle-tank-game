@@ -80,15 +80,27 @@ public class LevelManager : Singleton<LevelManager>
         // Wait 1 second before destorying
         yield return new WaitForSeconds(1f);
 
+        EnemyTankService enemyTankService = EnemyTankService.Instance;
+        List<EnemyTankController> EnemyTankControllerList = new List<EnemyTankController>();
+        if (enemyTankService != null)
+            EnemyTankControllerList = enemyTankService.EnemyTankControllerList; 
+
         // Get Enemy Tanks in the scene
         // Currently enemies werent created under a parent gameObject 
         // So using object based search instead of string based tag search
-        EnemyTankView[] EnemyTanks = GameObject.FindObjectsOfType<EnemyTankView>();
-        foreach (EnemyTankView EnemyTank in EnemyTanks)
+        // EnemyTankView[] EnemyTanks = GameObject.FindObjectsOfType<EnemyTankView>();
+        foreach (EnemyTankController enemyTankController in EnemyTankControllerList)
         {
-            if(EnemyTank.gameObject != null)
-                GameObject.Destroy(EnemyTank.gameObject);
+            try
+            {
+                EnemyTankView EnemyTank = enemyTankController.EnemyTankView;
 
+                if (EnemyTank.gameObject != null)
+                    GameObject.Destroy(EnemyTank.gameObject);
+            }
+            catch (Exception ex) {
+                Debug.LogWarning(ex);
+            }
             // Wait 0.5 seconds after destorying
             yield return new WaitForSeconds(.5f);
         }
